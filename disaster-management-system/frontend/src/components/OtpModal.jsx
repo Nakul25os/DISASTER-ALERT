@@ -1,3 +1,5 @@
+import { Mail } from 'lucide-react'
+
 export default function OtpModal({ email, onVerify, onClose, loading, error }) {
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -10,7 +12,13 @@ export default function OtpModal({ email, onVerify, onClose, loading, error }) {
       <div className="glass max-w-md w-full rounded-2xl p-8 shadow-glow">
         <h2 className="text-2xl font-bold text-headline">Verify Email</h2>
         <p className="text-body mt-2 text-sm">OTP sent to {email}. Expires in 5 minutes.</p>
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+
+        <div className="mt-4 p-3 rounded-xl bg-blue-950/40 border border-blue-500/30 text-xs text-blue-200 flex items-center gap-2">
+          <Mail className="w-4 h-4 text-cyan-400 shrink-0" />
+          <span><strong>Verification code sent!</strong> Check your <strong>Inbox</strong> (and <strong>Spam / Junk</strong> folder if not visible).</span>
+        </div>
+
+        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           <input
             name="otp"
             maxLength={6}

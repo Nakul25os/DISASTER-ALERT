@@ -56,8 +56,10 @@ public class EventController {
     @PostMapping("/ingest")
     public ResponseEntity<DisasterEvent> ingest(@RequestBody DisasterEvent event) {
         if (event.getSource() == null) event.setSource(EventSource.MANUAL);
+        if (event.getTimestamp() == null) event.setTimestamp(java.time.Instant.now());
         return ResponseEntity.ok(eventProcessor.processEvent(event));
     }
+
 
     public record SimulateRequest(
             DisasterType type, int severity,

@@ -37,7 +37,7 @@ export default function Landing() {
   }, [])
 
   return (
-    <div className="bg-cinematic-black min-h-screen">
+    <div id="hero" className="bg-cinematic-black min-h-screen">
       <Navbar />
       <EarthScrollHero />
 
@@ -89,7 +89,7 @@ export default function Landing() {
             <h2 className="text-3xl md:text-5xl font-bold text-headline">Live Disaster Intelligence Map</h2>
             <p className="text-body mt-4 text-base max-w-2xl mx-auto">
               A live window into India's disaster monitoring grid — real shelters, active events,
-              AI threat heatmaps, and rainfall overlays updating every 30 seconds.
+              AI social intelligence, and rainfall overlays updating every 30 seconds.
             </p>
           </motion.div>
 

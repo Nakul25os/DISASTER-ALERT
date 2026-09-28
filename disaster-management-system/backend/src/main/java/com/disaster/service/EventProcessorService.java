@@ -67,9 +67,24 @@ public class EventProcessorService {
                 .build();
         alertRepository.save(alert);
 
-        AlertMessage wsMessage = AlertMessage.from(saved);
+        AlertMessage wsMessage = AlertMessage.builder()
+                .id(saved.getId())
+                .disasterType(saved.getDisasterType())
+                .severity(saved.getSeverity())
+                .location(saved.getLocation())
+                .latitude(saved.getLatitude())
+                .longitude(saved.getLongitude())
+                .message(saved.getMessage())
+                .timestamp(saved.getTimestamp())
+                .affectedRadius(saved.getAffectedRadius())
+                .source(saved.getSource())
+                .state(saved.getState())
+                .officialSeverity(saved.getOfficialSeverity())
+                .sourceUrl(saved.getSourceUrl())
+                .build();
         messagingTemplate.convertAndSend("/topic/alerts", wsMessage);
         messagingTemplate.convertAndSend("/topic/dashboard", wsMessage);
+
 
         activateShelters(saved);
         assignVolunteers(saved);

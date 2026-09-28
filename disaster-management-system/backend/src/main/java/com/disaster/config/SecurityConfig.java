@@ -59,6 +59,7 @@ public class SecurityConfig {
 
         // ── Shelter Public (map display) ──────────────────────────────
         .requestMatchers("/api/shelters/public/**").permitAll()
+        .requestMatchers("/api/volunteers/**").permitAll()
 
         // ── Disaster Public (map markers + UptimeRobot) ───────────────
         .requestMatchers("/api/disasters/**").permitAll()
@@ -68,14 +69,19 @@ public class SecurityConfig {
         .requestMatchers(HttpMethod.POST, "/api/rescue/request").permitAll()
         .requestMatchers("/api/rescue/nearby").permitAll()
 
-        // ── Public / Integrations / AI ────────────────────────────────
+        // ── Public / Integrations / AI / Verification ───────────────
         .requestMatchers("/api/public/**").permitAll()
         .requestMatchers("/api/integrations/**").permitAll()
         .requestMatchers("/api/ai/**").permitAll()
+        .requestMatchers("/api/verification/**").permitAll()
 
         // ── Health check for UptimeRobot — NO method restriction ──────
         .requestMatchers("/api/health").permitAll()
         .requestMatchers("/actuator/health").permitAll()
+
+        // ── Internal service-to-service ingest (Python NLP → Spring Boot) ─
+        .requestMatchers(HttpMethod.POST, "/api/events/ingest").permitAll()
+
 
         // ── Simulation — any logged-in user ───────────────────────────
         .requestMatchers("/api/events/simulate").authenticated()

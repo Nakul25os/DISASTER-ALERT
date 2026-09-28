@@ -29,6 +29,7 @@ export default function SafeZones({ regionData }) {
         radius: zone.radius * 1.6,
         color: col.stroke, fillColor: col.fill, fillOpacity: 0.03,
         weight: 1, opacity: 0.3, dashArray: "6 8",
+        interactive: false,
       }).addTo(map);
 
       const perimeter = L.circle([zone.lat, zone.lng], {
@@ -36,12 +37,14 @@ export default function SafeZones({ regionData }) {
         color: col.stroke, fillColor: col.fill, fillOpacity: 0.08,
         weight: 2.5, opacity: 0.85,
         dashArray: zone.status === "STANDBY" ? "8 5" : null,
+        interactive: false,
       }).addTo(map);
 
       const inner = L.circle([zone.lat, zone.lng], {
         radius: zone.radius * 0.35,
         color: col.stroke, fillColor: col.fill, fillOpacity: 0.18,
         weight: 1, opacity: 0.6,
+        interactive: false,
       }).addTo(map);
 
       const icon = L.divIcon({

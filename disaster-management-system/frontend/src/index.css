@@ -113,6 +113,38 @@ body {
   font-size: 9px !important;
 }
 
+/* Genuine OpenStreetMap Dark Mode styling (Zero API Key required) */
+.theme-osm-dark .leaflet-tile-pane,
+.osm-dark-tiles,
+.osm-dark-tiles .leaflet-tile,
+.osm-dark-tiles img {
+  filter: invert(100%) hue-rotate(180deg) brightness(82%) contrast(120%) saturate(0.8) !important;
+}
+
+/* Custom Scrollbar for Intelligence & Threat Panels */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 9999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 240, 255, 0.6);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+}
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) rgba(255, 255, 255, 0.04);
+}
+
+
+
 .map-scanline {
   pointer-events: none;
   background: repeating-linear-gradient(
@@ -396,8 +428,8 @@ body {
 }
 
 @keyframes tickerScroll {
-  0% { transform: translateX(100vw); }
-  100% { transform: translateX(-100%); }
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 .glow-panel {
@@ -433,6 +465,34 @@ body {
 .custom-leaflet-popup .leaflet-popup-tip-container {
   display: none;
 }
+
+/* ── Disaster Spot AI Heatmap Analysis Popup ── */
+.disaster-spot-popup .leaflet-popup-content-wrapper {
+  background: rgba(8, 11, 22, 0.96) !important;
+  backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(0, 240, 255, 0.3) !important;
+  box-shadow: 0 0 50px rgba(0, 80, 255, 0.35), 0 25px 60px rgba(0, 0, 0, 0.9) !important;
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+.disaster-spot-popup .leaflet-popup-content {
+  margin: 0 !important;
+  width: 100% !important;
+}
+.disaster-spot-popup a.leaflet-popup-close-button {
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-size: 22px !important;
+  top: 12px !important;
+  right: 14px !important;
+  z-index: 30 !important;
+  transition: color 0.2s, transform 0.2s !important;
+}
+.disaster-spot-popup a.leaflet-popup-close-button:hover {
+  color: #00f0ff !important;
+  transform: scale(1.15) !important;
+}
+
 .leaflet-popup-content-wrapper {
   background: rgba(5, 5, 15, 0.97) !important;
   border: 1px solid rgba(255,255,255,0.08) !important;

@@ -24,3 +24,19 @@ export function subscribeShelters(client, handler) {
 export function subscribeRescue(client, handler) {
   return client.subscribe('/topic/rescue', (msg) => handler(JSON.parse(msg.body)))
 }
+
+export function subscribeVerification(client, handler) {
+  return client.subscribe('/topic/verification', (msg) => handler(JSON.parse(msg.body)))
+}
+
+export function subscribeVerificationSocial(client, handler) {
+  return client.subscribe('/topic/verification-social', (msg) => handler(JSON.parse(msg.body)))
+}
+
+export function subscribeVerificationAuthoritative(client, handler) {
+  return client.subscribe('/topic/verification-authoritative', (msg) => handler(JSON.parse(msg.body)))
+}
+
+export function subscribeVerificationReset(client, handler) {
+  return client.subscribe('/topic/verification-reset', (msg) => handler(JSON.parse(msg.body)))
+}

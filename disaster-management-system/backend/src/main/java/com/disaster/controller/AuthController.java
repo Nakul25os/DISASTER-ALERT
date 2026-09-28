@@ -23,6 +23,7 @@ public class AuthController {
         if (!req.password().equals(req.confirmPassword())) {
             throw new IllegalArgumentException("Passwords do not match");
         }
+        com.disaster.util.PasswordValidator.validate(req.password());
         var data = new AuthService.UserRegistrationData(
                 req.username(), req.email(), req.password(),
                 req.location(), req.state(), req.city());

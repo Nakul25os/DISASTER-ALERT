@@ -20,6 +20,9 @@ public class AiRiskService {
     private static final String GROK_API_KEY = "";
 
     public AiThreatAnalysis analyzeThreat(double lat, double lng) {
+        if (GROK_API_KEY == null || GROK_API_KEY.isBlank()) {
+            return getMockData(lat, lng);
+        }
         try {
             String prompt = String.format(
                 "You are a GIS and natural disaster analysis agent. Given a geographic coordinate in India (latitude: %f, longitude: %f), analyze the potential disaster threats (monsoon floods, landslides, cyclones, seismic risk, etc.) for this area. " +

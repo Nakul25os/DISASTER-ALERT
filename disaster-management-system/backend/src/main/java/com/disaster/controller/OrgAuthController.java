@@ -25,6 +25,7 @@ public class OrgAuthController {
         if (!req.password().equals(req.confirmPassword())) {
             throw new IllegalArgumentException("Passwords do not match");
         }
+        com.disaster.util.PasswordValidator.validate(req.password());
         var data = new OrganisationAuthService.OrgRegistrationData(
                 req.organisationName(), req.email(), req.password(),
                 req.country(), req.state(), req.city(), req.headquartersLocation());

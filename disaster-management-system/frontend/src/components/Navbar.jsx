@@ -1,19 +1,44 @@
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Menu, X, Shield } from 'lucide-react'
 import { motion } from 'framer-motion'
-
-const links = [
-  { label: 'Home', href: '/#hero' },
-  { label: 'Features', href: '/#features' },
-  { label: 'About', href: '/#about' },
-  { label: 'Dashboard', to: '/dashboard' },
-]
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
   const isLanding = location.pathname === '/'
+
+  const handleScrollNav = (e, targetId) => {
+    e.preventDefault()
+    setOpen(false)
+
+    if (targetId === 'hero') {
+      if (isLanding) {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      } else {
+        navigate('/')
+        setTimeout(() => {
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+        }, 100)
+      }
+    } else if (targetId === 'features') {
+      if (isLanding) {
+        const el = document.getElementById('features')
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      } else {
+        navigate('/')
+        setTimeout(() => {
+          const el = document.getElementById('features')
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          }
+        }, 200)
+      }
+    }
+  }
 
   return (
     <motion.nav
@@ -28,17 +53,30 @@ export default function Navbar() {
         </Link>
 
         <div className="hidden md:flex items-center gap-6 text-sm text-body">
-          {links.map((l) =>
-            l.to ? (
-              <Link key={l.label} to={l.to} className="hover:text-white transition-colors">
-                {l.label}
-              </Link>
-            ) : (
-              <a key={l.label} href={isLanding ? l.href : `/${l.href}`} className="hover:text-white transition-colors">
-                {l.label}
-              </a>
-            )
-          )}
+          {/* Home Button */}
+          <button
+            type="button"
+            onClick={(e) => handleScrollNav(e, 'hero')}
+            className="hover:text-white transition-colors cursor-pointer text-left"
+          >
+            Home
+          </button>
+
+          {/* Features Button */}
+          <button
+            type="button"
+            onClick={(e) => handleScrollNav(e, 'features')}
+            className="hover:text-white transition-colors cursor-pointer text-left"
+          >
+            Features
+          </button>
+
+          <Link to="/verification" className="hover:text-white transition-colors">
+            Verification Pipeline
+          </Link>
+          <Link to="/damage-heatmap" className="hover:text-white transition-colors">
+            AI Damage Heatmap
+          </Link>
           <Link to="/org/login" className="hover:text-accent-orange transition-colors">
             Org Login
           </Link>
@@ -63,17 +101,22 @@ export default function Navbar() {
 
       {open && (
         <div className="md:hidden glass border-t border-white/10 p-4 flex flex-col gap-3">
-          {links.map((l) =>
-            l.to ? (
-              <Link key={l.label} to={l.to} onClick={() => setOpen(false)}>
-                {l.label}
-              </Link>
-            ) : (
-              <a key={l.label} href={l.href} onClick={() => setOpen(false)}>
-                {l.label}
-              </a>
-            )
-          )}
+          <button
+            type="button"
+            onClick={(e) => handleScrollNav(e, 'hero')}
+            className="text-left text-sm text-body hover:text-white"
+          >
+            Home
+          </button>
+          <button
+            type="button"
+            onClick={(e) => handleScrollNav(e, 'features')}
+            className="text-left text-sm text-body hover:text-white"
+          >
+            Features
+          </button>
+          <Link to="/verification" onClick={() => setOpen(false)}>Verification Pipeline</Link>
+          <Link to="/damage-heatmap" onClick={() => setOpen(false)}>AI Damage Heatmap</Link>
           <Link to="/org/login" onClick={() => setOpen(false)}>Org Login</Link>
           <Link to="/org/signup" onClick={() => setOpen(false)}>Org Signup</Link>
           <Link to="/login" onClick={() => setOpen(false)}>Login</Link>

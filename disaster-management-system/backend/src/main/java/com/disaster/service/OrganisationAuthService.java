@@ -35,10 +35,13 @@ public class OrganisationAuthService {
         this.emailService = emailService;
     }
 
-    /** First step organisation registration — save unverified organisation to DB and send verification OTP */
     public AuthResponse register(OrgRegistrationData data) {
-        if (organisationRepository.existsByEmail(data.email())) {
-            throw new com.disaster.exception.ConflictException("Email already registered");
+        Organisation existingOrgByEmail = organisationRepository.findByEmail(data.email()).orElse(null);
+        if (existingOrgByEmail != null) {
+            if (existingOrgByEmail.isVerified()) {
+                throw new com.disaster.exception.ConflictException("Email already registered. Please log in.");
+            }
+            organisationRepository.delete(existingOrgByEmail);
         }
 
         Organisation org = Organisation.builder()
@@ -58,8 +61,9 @@ public class OrganisationAuthService {
         org.syncGeo();
         organisationRepository.save(org);
 
+        String otp;
         try {
-            String otp = otpService.generateAndStore(data.email(), OtpVerification.OtpPurpose.ORG_REGISTER, null);
+            otp = otpService.generateAndStore(data.email(), OtpVerification.OtpPurpose.ORG_REGISTER, null);
             emailService.sendOtpEmail(data.email(), otp);
         } catch (Exception e) {
             organisationRepository.delete(org);
@@ -69,7 +73,7 @@ public class OrganisationAuthService {
         return AuthResponse.builder()
                 .requireOtp(true)
                 .email(data.email())
-                .message("Verification OTP sent to " + data.email())
+                .message("Verification OTP sent to " + data.email() + ". Please check your Gmail.")
                 .build();
     }
 

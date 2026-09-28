@@ -2,6 +2,7 @@ package com.disaster.dto;
 
 import com.disaster.model.DisasterEvent;
 import com.disaster.model.DisasterType;
+import com.disaster.model.EventSource;
 import lombok.Builder;
 import lombok.Data;
 
@@ -19,6 +20,11 @@ public class AlertMessage {
     private String message;
     private Instant timestamp;
     private double affectedRadius;
+    // SACHET NDMA enrichment fields — populated for SACHET_NDMA source, null for others
+    private EventSource source;
+    private String state;
+    private String officialSeverity;
+    private String sourceUrl;
 
     public static AlertMessage from(DisasterEvent e) {
         return AlertMessage.builder()
@@ -31,6 +37,7 @@ public class AlertMessage {
                 .message(e.getMessage())
                 .timestamp(e.getTimestamp())
                 .affectedRadius(e.getAffectedRadius())
+                .source(e.getSource())
                 .build();
     }
 }

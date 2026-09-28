@@ -49,19 +49,31 @@ public class EmailService {
      * OTP must be synchronous so registration fails loudly if email cannot be sent.
      */
     public void sendOtpEmail(String to, String otp) throws EmailDeliveryException {
-        String subject = "Disaster Platform Email Verification";
+        log.info("════════════════════════════════════════════════════════════");
+        log.info("🔑 [OTP GENERATED] Email: {} | CODE: {} (Valid 5 mins)", to, otp);
+        log.info("════════════════════════════════════════════════════════════");
+
+        String subject = otp + " is your verification code - Smart Disaster Alert";
         String html = """
-                <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:24px;background:#050505;color:#fff;border-radius:12px;">
-                  <h2 style="color:#0050FF;margin:0 0 16px;">Email Verification</h2>
-                  <p style="color:rgba(255,255,255,0.7);">Your one-time password for Smart Disaster Alert Platform:</p>
-                  <p style="font-size:32px;letter-spacing:8px;font-weight:bold;color:#FF6A00;text-align:center;margin:24px 0;">%s</p>
-                  <p style="color:rgba(255,255,255,0.6);font-size:13px;">This code expires in <strong>5 minutes</strong>. Do not share it with anyone.</p>
-                  <hr style="border:none;border-top:1px solid rgba(255,255,255,0.1);margin:24px 0;">
-                  <p style="color:rgba(255,255,255,0.4);font-size:12px;">Smart Disaster Alert &amp; Resource Coordination System</p>
+                <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:520px;margin:20px auto;padding:32px;background:#ffffff;color:#1e293b;border:1px solid #e2e8f0;border-radius:16px;box-shadow:0 4px 16px rgba(0,0,0,0.06);">
+                  <div style="text-align:center;margin-bottom:24px;">
+                    <img src="cid:disasterLogo" alt="Smart Disaster Alert" style="width:100px;height:100px;border-radius:18px;box-shadow:0 6px 18px rgba(0,80,255,0.15);" />
+                    <h2 style="color:#0f172a;margin:14px 0 4px;font-size:24px;font-weight:700;">Smart Disaster Alert</h2>
+                    <p style="color:#64748b;margin:0;font-size:13px;font-weight:500;">Emergency Response &amp; Resource Coordination Network</p>
+                  </div>
+                  <hr style="border:none;border-top:1px solid #e2e8f0;margin:20px 0;">
+                  <h3 style="color:#0f172a;margin-top:0;font-size:18px;font-weight:600;">Verify your email address</h3>
+                  <p style="font-size:14px;color:#475569;line-height:1.5;">Thank you for registering. Use this 6-digit verification code to complete your signup:</p>
+                  <div style="background:#f8fafc;border:2px dashed #93c5fd;border-radius:10px;padding:18px;text-align:center;margin:24px 0;">
+                    <span style="font-size:36px;font-family:Consolas,monospace;letter-spacing:10px;font-weight:700;color:#2563eb;">%s</span>
+                  </div>
+                  <p style="font-size:13px;color:#64748b;line-height:1.5;">This code will expire in <strong>5 minutes</strong>. If you did not request this email, please safely disregard it.</p>
+                  <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0;">
+                  <p style="font-size:12px;color:#94a3b8;margin:0;text-align:center;">Smart Disaster Alert &amp; Emergency Coordination Network</p>
                 </div>
                 """.formatted(otp);
 
-        String text = "Your OTP code is: " + otp + "\n\nThis code expires in 5 minutes.\n\n— Smart Disaster Alert Platform";
+        String text = "Your Smart Disaster Alert verification code is: " + otp + "\n\nThis code expires in 5 minutes.\n\nIf you did not request this, please ignore this email.";
 
         deliverSync(to, subject, text, html);
         log.info("OTP email delivered to {}", to);
@@ -145,21 +157,38 @@ public class EmailService {
         }
     }
 
+    @Value("${GMAIL_USER:${spring.mail.username:}}")
+    private String gmailUser;
+
     private void deliverSync(String to, String subject, String text, String html) throws EmailDeliveryException {
-        if (fromEmail == null || fromEmail.isBlank()) {
-            throw new EmailDeliveryException("Mail sender address (MAIL_FROM) is not configured");
+        String cleanFrom = (fromEmail != null) ? fromEmail.replace("\"", "").replace("'", "").trim() : "";
+        String senderEmail = (gmailUser != null && !gmailUser.isBlank()) 
+                ? gmailUser.replace("\"", "").replace("'", "").trim() 
+                : cleanFrom;
+
+        if (senderEmail.isBlank()) {
+            throw new EmailDeliveryException("Mail sender address (MAIL_FROM / GMAIL_USER) is not configured");
         }
 
         Exception lastError = null;
 
-        // Gmail app password is most reliable for @gmail.com recipients/senders
-        if (hasGmailCredentials() && (useGmail() || "auto".equalsIgnoreCase(mailProvider))) {
+        // Prioritize Gmail SMTP using the configured Google App Password
+        if (hasGmailCredentials()) {
             try {
-                sendViaSmtp(to, subject, text, html, "smtp.gmail.com", fromEmail, getGmailPassword());
+                sendViaSmtp(to, subject, text, html, "smtp.gmail.com", senderEmail, getGmailPassword());
+                log.info("Email sent successfully via Gmail SMTP to {}", to);
                 return;
             } catch (Exception e) {
                 lastError = e;
-                log.warn("Gmail SMTP failed: {}", e.getMessage());
+                log.warn("Gmail SMTP primary attempt failed: {}. Retrying without spaces...", e.getMessage());
+                try {
+                    sendViaSmtp(to, subject, text, html, "smtp.gmail.com", senderEmail, getGmailPassword().replace(" ", ""));
+                    log.info("Email sent successfully via Gmail SMTP (no-spaces) to {}", to);
+                    return;
+                } catch (Exception e2) {
+                    lastError = e2;
+                    log.error("Gmail SMTP retry also failed: {}", e2.getMessage());
+                }
             }
         }
 
@@ -177,8 +206,7 @@ public class EmailService {
             sendViaSmtp(to, subject, text, html, mailHost, resolveSmtpUsername(), mailPassword);
         } catch (Exception e) {
             throw new EmailDeliveryException(
-                    "Could not send email. In Brevo: verify sender " + fromEmail
-                            + ". Or use Gmail app password. Details: "
+                    "Could not send email to " + to + ". Details: "
                             + (lastError != null ? lastError.getMessage() : e.getMessage()), e);
         }
     }
@@ -215,16 +243,39 @@ public class EmailService {
         JavaMailSender sender = createMailSender(host, username, password);
         MimeMessage message = sender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-        helper.setFrom(new InternetAddress(fromEmail, fromName));
+        helper.setFrom(new InternetAddress(username, fromName));
         helper.setTo(to);
         helper.setSubject(subject);
         if (html != null) {
             helper.setText(text, html);
+            if (html.contains("cid:disasterLogo")) {
+                attachDisasterLogo(helper);
+            }
         } else {
             helper.setText(text, false);
         }
         sender.send(message);
         log.info("Email sent via SMTP ({}) to {}", host, to);
+    }
+
+    private void attachDisasterLogo(MimeMessageHelper helper) {
+        try {
+            org.springframework.core.io.ClassPathResource classPathResource = 
+                    new org.springframework.core.io.ClassPathResource("static/images/disaster_logo.jpg");
+            if (classPathResource.exists()) {
+                helper.addInline("disasterLogo", classPathResource, "image/jpeg");
+                return;
+            }
+            java.io.File file = new java.io.File("src/main/resources/static/images/disaster_logo.jpg");
+            if (!file.exists()) {
+                file = new java.io.File("backend/src/main/resources/static/images/disaster_logo.jpg");
+            }
+            if (file.exists()) {
+                helper.addInline("disasterLogo", new org.springframework.core.io.FileSystemResource(file), "image/jpeg");
+            }
+        } catch (Exception e) {
+            log.warn("Could not attach inline disaster logo: {}", e.getMessage());
+        }
     }
 
     private JavaMailSender createMailSender(String host, String username, String password) {
@@ -239,6 +290,7 @@ public class EmailService {
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.starttls.required", "true");
         props.put("mail.smtp.ssl.trust", host);
+        props.put("mail.smtp.ssl.protocols", "TLSv1.2 TLSv1.3");
         props.put("mail.debug", "false");
         return impl;
     }
@@ -278,10 +330,11 @@ public class EmailService {
     }
 
     private String getGmailPassword() {
-        if (gmailAppPassword != null && !gmailAppPassword.isBlank()) {
-            return gmailAppPassword;
+        String pw = (gmailAppPassword != null && !gmailAppPassword.isBlank()) ? gmailAppPassword : mailPassword;
+        if (pw != null) {
+            return pw.replace("\"", "").replace("'", "").trim();
         }
-        return mailPassword;
+        return "";
     }
 
     private String resolveSmtpUsername() {

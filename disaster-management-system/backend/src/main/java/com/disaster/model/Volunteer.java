@@ -20,6 +20,9 @@ public class Volunteer {
     @Id
     private String id;
     private String userId;
+    private String name;
+    private String contact;
+    private String role;
     private List<String> skills = new ArrayList<>();
     private VolunteerStatus status;
     private String assignedDisasterId;

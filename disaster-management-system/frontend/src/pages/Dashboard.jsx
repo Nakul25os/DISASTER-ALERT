@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { eventsApi, shelterApi, simulateApi } from '../lib/api'
+import { useNavigate, Link } from 'react-router-dom'
+import { eventsApi, shelterApi, simulateApi, sachetApi } from '../lib/api'
 import { createStompClient, subscribeAlerts, subscribeShelters } from '../lib/websocket'
 import UnifiedDisasterMap from '../components/map/UnifiedDisasterMap'
 
@@ -15,13 +15,21 @@ export default function Dashboard() {
   const [events, setEvents] = useState([])
   const [localEvents, setLocalEvents] = useState([])
   const [localAlerts, setLocalAlerts] = useState([])
-  const [userLocation, setUserLocation] = useState(null)
+  const [sachetEvents, setSachetEvents] = useState([])
+  // userLocation used for SOS/simulate only — NOT passed to map to avoid auto-zoom
+  const [userLocation, setUserLocation] = useState(DEFAULT_CENTER)
   
-  const activeLocation = userLocation || DEFAULT_CENTER
+  const activeLocation = userLocation
   
   const visibleShelters = useMemo(() => shelters, [shelters])
   const visibleEvents = useMemo(() => [...localEvents, ...events], [events, localEvents])
-  const visibleAlerts = useMemo(() => [...localAlerts, ...alerts], [alerts, localAlerts])
+  // sachetAlerts feeds the bottom ticker alongside WS alerts and local drills
+  const [sachetAlerts, setSachetAlerts] = useState([])
+  const visibleAlerts = useMemo(
+    () => [...sachetAlerts, ...localAlerts, ...alerts],
+    [alerts, localAlerts, sachetAlerts]
+  )
+
 
   useEffect(() => {
     if (!localStorage.getItem('token')) {
@@ -35,19 +43,59 @@ export default function Dashboard() {
       }
     }
     
-    // Get user GPS
+    // GPS is fetched silently for SOS/simulate accuracy but does NOT move the map
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-        () => setUserLocation(DEFAULT_CENTER)
+        () => {} // silent fail — map stays at Pan India view
       )
     }
 
     loadData()
+    loadSachetAlerts()
+
     const client = createStompClient((c) => {
       subscribeAlerts(c, (a) => {
+        // If incoming WS alert is SACHET_NDMA, merge into map events AND ticker
+        if (a.source === 'SACHET_NDMA') {
+          const mapEvent = {
+            id: a.id,
+            disasterType: a.disasterType,
+            title: a.message,
+            message: a.message,
+            location: a.location,
+            latitude: a.latitude,
+            longitude: a.longitude,
+            severity: a.severity,
+            affectedRadius: a.affectedRadius || 25,
+            source: 'SACHET_NDMA',
+            state: a.state,
+            officialSeverity: a.officialSeverity,
+            sourceUrl: a.sourceUrl,
+            timestamp: a.timestamp,
+          }
+          setSachetEvents((prev) => {
+            if (prev.some((e) => e.id === mapEvent.id)) return prev
+            return [mapEvent, ...prev].slice(0, 100)
+          })
+          // Also push to bottom ticker
+          setSachetAlerts((prev) => {
+            if (prev.some((e) => e.id === a.id)) return prev
+            return [{
+              id: a.id,
+              disasterType: a.disasterType,
+              message: a.message,
+              location: a.location,
+              source: 'SACHET_NDMA',
+              state: a.state,
+              officialSeverity: a.officialSeverity,
+              sourceUrl: a.sourceUrl,
+            }, ...prev].slice(0, 50)
+          })
+        }
         setAlerts((prev) => [a, ...prev].slice(0, 20))
         loadData()
+
       })
       subscribeShelters(c, (s) => {
         setShelters((prev) => {
@@ -68,6 +116,47 @@ export default function Dashboard() {
     eventsApi.active().then((r) => setEvents(r.data)).catch(() => {})
     shelterApi.list().then((r) => setShelters(r.data)).catch(() => {})
   }
+
+  const loadSachetAlerts = () => {
+    sachetApi.alerts({ limit: 50 })
+      .then((r) => {
+        const data = r.data?.alerts || []
+
+        // Map Python SACHET event format → DisasterEvent-like shape for map markers
+        const mappedEvents = data.map((ev) => ({
+          id: ev.id,
+          disasterType: ev.disasterType,
+          title: ev.message,
+          message: ev.message,
+          location: ev.location,
+          latitude: ev.latitude,
+          longitude: ev.longitude,
+          severity: ev.severity,
+          affectedRadius: ev.affectedRadius || 25,
+          source: 'SACHET_NDMA',
+          state: ev.state,
+          officialSeverity: ev.officialSeverity,
+          sourceUrl: ev.sourceUrl,
+          timestamp: ev.timestamp,
+        }))
+        setSachetEvents(mappedEvents)
+
+        // Also feed the bottom ticker — same shape but only needs ticker fields
+        const tickerAlerts = data.map((ev) => ({
+          id: ev.id,
+          disasterType: ev.disasterType,
+          message: ev.message,
+          location: ev.location,
+          source: 'SACHET_NDMA',
+          state: ev.state,
+          officialSeverity: ev.officialSeverity,
+          sourceUrl: ev.sourceUrl,
+        }))
+        setSachetAlerts(tickerAlerts)
+      })
+      .catch(() => {})
+  }
+
 
   const simulate = async (type) => {
     try {
@@ -106,11 +195,26 @@ export default function Dashboard() {
   }
 
   return (
-    <div style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}>
-      <UnifiedDisasterMap 
-        center={activeLocation} 
-        events={visibleEvents} 
-        shelters={visibleShelters} 
+    <div style={{ width: '100vw', height: '100vh', overflow: 'hidden', position: 'relative' }}>
+      {/* Floating Verification Pipeline Telemetry Badge */}
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 pointer-events-auto">
+        <Link
+          to="/verification"
+          className="flex items-center gap-2 px-4 py-2 rounded-full glass border border-emerald-500/40 text-xs font-medium text-emerald-300 hover:text-white hover:border-emerald-400 bg-cinematic-black/80 backdrop-blur-md shadow-lg shadow-emerald-950/40 transition-all hover:scale-105"
+        >
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="font-semibold">Cross-Source Verification:</span>
+          <span className="text-slate-200">Panic Shield Active</span>
+          <span className="text-accent-blue font-bold ml-1 flex items-center">
+            Open Pipeline &rarr;
+          </span>
+        </Link>
+      </div>
+
+      {/* center prop intentionally omitted — map opens at Pan India zoom-5 view */}
+      <UnifiedDisasterMap
+        events={visibleEvents}
+        shelters={visibleShelters}
         alerts={visibleAlerts}
         onSimulate={simulate}
       />

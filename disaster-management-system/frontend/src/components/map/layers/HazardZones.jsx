@@ -77,7 +77,7 @@ export default function HazardZones({ regionData }) {
             <div class="relative flex items-center justify-center" style="width: 32px; height: 32px;">
               <!-- Epicenter Solid Core -->
               <div class="relative w-4 h-4 rounded-full bg-red-500 border border-white flex items-center justify-center z-10 shadow-[0_0_12px_rgba(239,68,68,1)]">
-                <span style="font-size: 8px;">🫨</span>
+                <div class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></div>
               </div>
               <!-- Concentric waves -->
               <div class="seismic-ring"></div>
@@ -98,6 +98,7 @@ export default function HazardZones({ regionData }) {
           weight: 1.5,
           dashArray: "6 6",
           opacity: 0.6,
+          interactive: false,
         }).addTo(map);
 
         // 3. Info Popup Content
@@ -106,7 +107,7 @@ export default function HazardZones({ regionData }) {
             border:1px solid ${sColor}55;min-width:240px;font-family:Inter,sans-serif;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
               <span style="font-size:10px;letter-spacing:0.1em;color:${sColor};font-weight:700;text-transform:uppercase;">
-                ⚠️ Seismic Epicenter
+                SEISMIC EPICENTER
               </span>
               <span style="font-size:9px;padding:2px 8px;border-radius:20px;
                 background:${sColor}22;color:${sColor};font-weight:700;">Zone V</span>
@@ -163,6 +164,7 @@ export default function HazardZones({ regionData }) {
           weight: 1.5,
           dashArray: "10 5",
           opacity: 0.6,
+          interactive: false,
         }).addTo(map);
 
         // 3. Flowing storm track path
@@ -171,6 +173,7 @@ export default function HazardZones({ regionData }) {
           weight: 2.5,
           opacity: 0.75,
           className: "flow-track",
+          interactive: false,
         }).addTo(map);
 
         // 4. Info Popup
@@ -179,7 +182,7 @@ export default function HazardZones({ regionData }) {
             border:1px solid ${sColor}55;min-width:240px;font-family:Inter,sans-serif;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
               <span style="font-size:10px;letter-spacing:0.1em;color:${sColor};font-weight:700;text-transform:uppercase;">
-                🌀 Cyclone Storm System
+                CYCLONIC STORM SYSTEM
               </span>
               <span style="font-size:9px;padding:2px 8px;border-radius:20px;
                 background:${sColor}22;color:${sColor};font-weight:700;">Active</span>
@@ -227,6 +230,7 @@ export default function HazardZones({ regionData }) {
           fillOpacity: 0,
           weight: 6,
           opacity: 0.12,
+          interactive: false,
         }).addTo(map);
 
         // Centroid for label marker
@@ -243,7 +247,7 @@ export default function HazardZones({ regionData }) {
               font-size:9px;font-weight:700;color:${sColor};
               letter-spacing:0.08em;text-transform:uppercase;
               box-shadow:0 0 10px rgba(249,115,22,0.3);
-            ">⚠️ SLIDE RISK: ${hazard.hazardIndex}</div>
+            ">SLIDE RISK: ${hazard.hazardIndex}</div>
           `,
           iconAnchor: [0, 0],
         });
@@ -254,7 +258,7 @@ export default function HazardZones({ regionData }) {
             border:1px solid ${sColor}55;min-width:230px;font-family:Inter,sans-serif;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
               <span style="font-size:10px;letter-spacing:0.1em;color:${sColor};font-weight:700;text-transform:uppercase;">
-                ⛰️ Landslide Hazard
+                SLOPE FAILURE HAZARD
               </span>
               <span style="font-size:9px;padding:2px 8px;border-radius:20px;
                 background:${sColor}22;color:${sColor};font-weight:700;">CRITICAL</span>
@@ -308,7 +312,7 @@ export default function HazardZones({ regionData }) {
               font-size:9px;font-weight:700;color:${sColor};
               letter-spacing:0.08em;text-transform:uppercase;
               box-shadow:0 0 10px rgba(234,179,8,0.25);
-            ">☀️ DROUGHT DEFICIT: ${hazard.moistureDeficit}</div>
+            ">DROUGHT DEFICIT: ${hazard.moistureDeficit}</div>
           `,
           iconAnchor: [0, 0],
         });
@@ -319,7 +323,7 @@ export default function HazardZones({ regionData }) {
             border:1px solid ${sColor}55;min-width:240px;font-family:Inter,sans-serif;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
               <span style="font-size:10px;letter-spacing:0.1em;color:${sColor};font-weight:700;text-transform:uppercase;">
-                ☀️ Drought & Moisture Alert
+                DROUGHT & ARIDITY DEFICIT
               </span>
               <span style="font-size:9px;padding:2px 8px;border-radius:20px;
                 background:${sColor}22;color:${sColor};font-weight:700;">Severe</span>

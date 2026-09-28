@@ -13,7 +13,7 @@ export const REGIONS = {
     zoom: 11,
     primaryDisaster: "FLOOD",
     color: "#0050FF",
-    icon: "🌊",
+    icon: "FLOOD",
 
     sos: [
       { id: "mum-s1", lat: 19.0176, lng: 72.8562, msg: "Family of 4 stranded — roof flooding", severity: "CRITICAL", time: "2m ago" },
@@ -105,7 +105,7 @@ export const REGIONS = {
     zoom: 9,
     primaryDisaster: "FLOOD",
     color: "#00b4d8",
-    icon: "🌊",
+    icon: "FLOOD",
 
     sos: [
       { id: "ker-s1", lat: 9.496, lng: 76.339, msg: "Alappuzha backwaters — boat rescue needed", severity: "CRITICAL", time: "3m ago" },
@@ -193,7 +193,7 @@ export const REGIONS = {
     zoom: 9,
     primaryDisaster: "LANDSLIDE",
     color: "#a855f7",
-    icon: "⛰️",
+    icon: "LANDSLIDE",
 
     sos: [
       { id: "utt-s1", lat: 30.726, lng: 79.076, msg: "Badrinath road — 3 vehicles buried in landslide", severity: "CRITICAL", time: "1m ago" },
@@ -279,7 +279,7 @@ export const REGIONS = {
     zoom: 9,
     primaryDisaster: "FLOOD",
     color: "#f59e0b",
-    icon: "🌾",
+    icon: "DROUGHT",
 
     sos: [
       { id: "pun-s1", lat: 30.582, lng: 75.136, msg: "Ludhiana — Sutlej overbank, village cut off", severity: "CRITICAL", time: "4m ago" },
@@ -364,7 +364,7 @@ export const REGIONS = {
     zoom: 9,
     primaryDisaster: "LANDSLIDE",
     color: "#10b981",
-    icon: "🏔️",
+    icon: "LANDSLIDE",
 
     sos: [
       { id: "miz-s1", lat: 23.727, lng: 92.717, msg: "Aizawl — main road blocked by major landslide", severity: "CRITICAL", time: "2m ago" },
@@ -449,7 +449,7 @@ export const REGIONS = {
     zoom: 10,
     primaryDisaster: "FLOOD",
     color: "#f43f5e",
-    icon: "🌩️",
+    icon: "FLOOD",
 
     sos: [
       { id: "tel-s1", lat: 17.385, lng: 78.487, msg: "Hyderabad — Musi river breach, old city flooded", severity: "CRITICAL", time: "3m ago" },

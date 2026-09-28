@@ -15,6 +15,17 @@ public class DisasterApplication {
         SpringApplication.run(DisasterApplication.class, args);
     }
 
+    @org.springframework.context.annotation.Bean(name = "taskExecutor")
+    public org.springframework.core.task.TaskExecutor taskExecutor() {
+        org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor executor = new org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(4);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(50);
+        executor.setThreadNamePrefix("disaster-async-");
+        executor.initialize();
+        return executor;
+    }
+
     private static void loadEnv() {
         java.io.File envFile = new java.io.File(".env");
         if (!envFile.exists()) {

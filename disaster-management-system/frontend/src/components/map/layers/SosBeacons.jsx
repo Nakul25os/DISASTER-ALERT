@@ -75,7 +75,7 @@ export default function SosBeacons({ regionData, events = [] }) {
           <div style="background:rgba(5,5,15,0.97);color:#fff;padding:12px 14px;border-radius:12px;
             border:1px solid ${s.outer}55;min-width:210px;font-family:Inter,sans-serif;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-              <span style="font-size:11px;font-weight:900;color:${s.inner};letter-spacing:0.12em;">🚨 SOS BEACON</span>
+              <span style="font-size:11px;font-weight:900;color:${s.inner};letter-spacing:0.12em;">EMERGENCY SOS BEACON</span>
               <span style="font-size:9px;padding:2px 8px;border-radius:20px;
                 background:${s.outer}33;color:${s.inner};font-weight:700;">${beacon.severity}</span>
             </div>

@@ -59,6 +59,12 @@ export const shelterApi = {
   create: (data) => api.post('/api/shelters', data),
 }
 
+export const volunteerApi = {
+  list: () => api.get('/api/volunteers'),
+  create: (data) => api.post('/api/volunteers', data),
+  updateStatus: (id, status) => api.patch(`/api/volunteers/${id}/status`, { status }),
+}
+
 export const rescueApi = {
   request: (data) => api.post('/api/rescue/request', data),
   list: () => api.get('/api/rescue'),
@@ -70,3 +76,28 @@ export const climateApi = {
   intelligence: (lat = 19.076, lng = 72.8777, hourOffset = 0) =>
     api.get('/api/climate/intelligence', { params: { lat, lng, hourOffset } }),
 }
+
+export const verificationApi = {
+  events: () => api.get('/api/verification/events'),
+  event: (id) => api.get(`/api/verification/events/${id}`),
+  metrics: () => api.get('/api/verification/metrics'),
+  socialStream: () => api.get('/api/verification/stream/social'),
+  authoritativeStream: () => api.get('/api/verification/stream/authoritative'),
+  simulateFalseRumor: () => api.post('/api/verification/simulate/false-rumor'),
+  simulateFlashFlood: () => api.post('/api/verification/simulate/flash-flood'),
+  simulateCyclone: () => api.post('/api/verification/simulate/cyclone'),
+  ingestSocial: (data) => api.post('/api/verification/ingest/social', data),
+  ingestAuthoritative: (data) => api.post('/api/verification/ingest/authoritative', data),
+  reset: () => api.post('/api/verification/reset'),
+}
+
+// SACHET NDMA Python-service API (port 8000)
+const PYTHON_URL = import.meta.env.VITE_PYTHON_URL || 'http://localhost:8000'
+const pythonApi = axios.create({ baseURL: PYTHON_URL })
+
+export const sachetApi = {
+  alerts: (params = {}) => pythonApi.get('/api/sachet/alerts', { params }),
+  poll: () => pythonApi.post('/api/sachet/poll'),
+  status: () => pythonApi.get('/api/sachet/status'),
+}
+

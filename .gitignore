@@ -28,3 +28,15 @@ walkthrough.md
 implementation_plan.md
 task.md
 deployment_guide.md
+
+# Large Archives & Binaries
+*.zip
+mongodb_data/
+apache-maven-3.9.6/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+

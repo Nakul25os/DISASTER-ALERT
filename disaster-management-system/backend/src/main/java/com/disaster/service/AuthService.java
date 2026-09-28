@@ -36,13 +36,22 @@ public class AuthService {
         this.emailService = emailService;
     }
 
-    /** First step registration — save unverified user to DB and send verification OTP */
     public AuthResponse register(UserRegistrationData data) {
-        if (userRepository.existsByUsername(data.username())) {
-            throw new com.disaster.exception.ConflictException("Username already exists");
+        User existingUserByEmail = userRepository.findByEmail(data.email()).orElse(null);
+        if (existingUserByEmail != null) {
+            if (existingUserByEmail.isVerified()) {
+                throw new com.disaster.exception.ConflictException("Email already registered. Please log in.");
+            }
+            // Clear unverified registration attempt so user can re-register cleanly
+            userRepository.delete(existingUserByEmail);
         }
-        if (userRepository.existsByEmail(data.email())) {
-            throw new com.disaster.exception.ConflictException("Email already exists");
+
+        User existingUserByUsername = userRepository.findByUsername(data.username()).orElse(null);
+        if (existingUserByUsername != null) {
+            if (existingUserByUsername.isVerified()) {
+                throw new com.disaster.exception.ConflictException("Username is already taken by a verified user.");
+            }
+            userRepository.delete(existingUserByUsername);
         }
 
         User user = User.builder()
@@ -61,8 +70,9 @@ public class AuthService {
         user.syncGeo();
         userRepository.save(user);
 
+        String otp;
         try {
-            String otp = otpService.generateAndStore(data.email(), OtpVerification.OtpPurpose.USER_REGISTER, null);
+            otp = otpService.generateAndStore(data.email(), OtpVerification.OtpPurpose.USER_REGISTER, null);
             emailService.sendOtpEmail(data.email(), otp);
         } catch (Exception e) {
             userRepository.delete(user);
@@ -72,7 +82,7 @@ public class AuthService {
         return AuthResponse.builder()
                 .requireOtp(true)
                 .email(data.email())
-                .message("Verification OTP sent to " + data.email())
+                .message("Verification OTP sent to " + data.email() + ". Please check your Gmail.")
                 .build();
     }
 

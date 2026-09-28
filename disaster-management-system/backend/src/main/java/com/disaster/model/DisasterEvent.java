@@ -32,6 +32,13 @@ public class DisasterEvent {
     @Builder.Default
     private boolean active = true;
 
+    // SACHET NDMA enrichment — populated only for SACHET_NDMA sourced events
+    private String state;
+    private String officialSeverity;
+    private String sourceUrl;
+    private String sachetId;
+    private String rawDisasterType;
+
     public void syncGeo() {
         this.geoLocation = GeoLocation.of(latitude, longitude);
     }

@@ -34,6 +34,7 @@ export default function FloodRiskZones({ regionData }) {
       // Glow outer border
       const glowPoly = L.polygon(zone.coords, {
         color: s.color, fillOpacity: 0, weight: 6, opacity: 0.12,
+        interactive: false,
       }).addTo(map);
 
       // Label at centroid
@@ -59,7 +60,7 @@ export default function FloodRiskZones({ regionData }) {
           border:1px solid ${s.color}55;min-width:220px;font-family:Inter,sans-serif;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
             <span style="font-size:10px;letter-spacing:0.1em;color:${s.color};font-weight:700;text-transform:uppercase;">
-              🌊 Flood Zone
+              FLOOD INUNDATION ZONE
             </span>
             <span style="font-size:9px;padding:2px 8px;border-radius:20px;
               background:${s.color}22;color:${s.color};font-weight:700;">${zone.risk}</span>

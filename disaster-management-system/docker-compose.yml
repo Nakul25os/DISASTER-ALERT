@@ -19,6 +19,21 @@ services:
     depends_on:
       - mongodb
 
+  python-nlp:
+    build: ../python-service
+    ports:
+      - "8000:8000"
+    environment:
+      MONGODB_URI: mongodb://mongodb:27017/disaster_db
+      SACHET_FEED_URL: ${SACHET_FEED_URL:-https://sachet.ndma.gov.in/cap_public_website/rss/rss_india.xml}
+      SACHET_POLL_INTERVAL_SECONDS: ${SACHET_POLL_INTERVAL_SECONDS:-300}
+      SACHET_MAX_STORED_ALERTS: ${SACHET_MAX_STORED_ALERTS:-500}
+      SACHET_ENABLED: ${SACHET_ENABLED:-true}
+      BACKEND_INGEST_URL: http://backend:8080/api/events/ingest
+    depends_on:
+      - mongodb
+      - backend
+
   frontend:
     build: ./frontend
     ports:
@@ -28,3 +43,4 @@ services:
 
 volumes:
   mongo_data:
+

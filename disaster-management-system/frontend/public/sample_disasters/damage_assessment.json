@@ -1,0 +1,59 @@
+{
+  "flood": {
+    "disaster_name": "Coastal River Flood Disaster",
+    "metrics": {
+      "damage_extent_percent": 38.4,
+      "critical_impact_percent": 21.7,
+      "mean_intensity": 0.412,
+      "peak_intensity": 0.985,
+      "hotspot": "Central Riverbed & North Quarter",
+      "severity_level": "CATASTROPHIC",
+      "urgency": "LEVEL 1 EMERGENCY -- IMMEDIATE MASS EVACUATION"
+    },
+    "artifacts": {
+      "before": "/sample_disasters/flood_before.jpg",
+      "after": "/sample_disasters/flood_after.jpg",
+      "heatmap": "/sample_disasters/flood_heatmap.png",
+      "overlay": "/sample_disasters/flood_overlay.png",
+      "board": "/sample_disasters/flood_diagnostic_board.png"
+    }
+  },
+  "landslide": {
+    "disaster_name": "Himalayan Landslide Disaster",
+    "metrics": {
+      "damage_extent_percent": 29.8,
+      "critical_impact_percent": 18.2,
+      "mean_intensity": 0.358,
+      "peak_intensity": 0.991,
+      "hotspot": "East Ridge Highway & Valley Floor",
+      "severity_level": "HIGH DAMAGE",
+      "urgency": "LEVEL 2 EMERGENCY -- DEPLOY RESCUE UNITS & AIR DROPS"
+    },
+    "artifacts": {
+      "before": "/sample_disasters/landslide_before.jpg",
+      "after": "/sample_disasters/landslide_after.jpg",
+      "heatmap": "/sample_disasters/landslide_heatmap.png",
+      "overlay": "/sample_disasters/landslide_overlay.png",
+      "board": "/sample_disasters/landslide_diagnostic_board.png"
+    }
+  },
+  "earthquake": {
+    "disaster_name": "Urban 7.8M Earthquake Disaster",
+    "metrics": {
+      "damage_extent_percent": 44.6,
+      "critical_impact_percent": 26.3,
+      "mean_intensity": 0.487,
+      "peak_intensity": 0.997,
+      "hotspot": "Commercial Plaza & Central Towers",
+      "severity_level": "CATASTROPHIC",
+      "urgency": "LEVEL 1 EMERGENCY -- IMMEDIATE SEARCH & RESCUE"
+    },
+    "artifacts": {
+      "before": "/sample_disasters/quake_before.jpg",
+      "after": "/sample_disasters/quake_after.jpg",
+      "heatmap": "/sample_disasters/earthquake_heatmap.png",
+      "overlay": "/sample_disasters/earthquake_overlay.png",
+      "board": "/sample_disasters/earthquake_diagnostic_board.png"
+    }
+  }
+}

@@ -128,21 +128,85 @@ public class DataSeeder implements CommandLineRunner {
             ngo.syncGeo();
             organisationRepository.save(ngo);
 
-            // 4. Seed Shelter
-            Shelter shelter = Shelter.builder()
-                    .name("Mumbai Central Relief Shelter")
-                    .organisationId(ngo.getId())
-                    .capacity(300)
-                    .availableBeds(280)
-                    .foodAvailable(true)
-                    .medicalAvailable(true)
-                    .latitude(19.0176)
-                    .longitude(72.8562)
-                    .contactDetails("+91-1800-RELief")
-                    .status(Shelter.ShelterStatus.INACTIVE)
-                    .build();
-            shelter.syncGeo();
-            shelterRepository.save(shelter);
+            // 4. Seed Shelters (Active nationwide relief shelters)
+            List<Shelter> seedShelters = List.of(
+                    Shelter.builder()
+                            .name("Mumbai Central Relief Hub")
+                            .organisationId(ngo.getId())
+                            .capacity(500)
+                            .availableBeds(340)
+                            .foodAvailable(true)
+                            .medicalAvailable(true)
+                            .latitude(19.0176)
+                            .longitude(72.8562)
+                            .contactDetails("+91-22-2269-4725")
+                            .status(Shelter.ShelterStatus.ACTIVE)
+                            .build(),
+                    Shelter.builder()
+                            .name("Kurla Emergency Evacuation Camp")
+                            .organisationId(ngo.getId())
+                            .capacity(450)
+                            .availableBeds(280)
+                            .foodAvailable(true)
+                            .medicalAvailable(true)
+                            .latitude(19.0728)
+                            .longitude(72.8826)
+                            .contactDetails("+91-22-2650-1122")
+                            .status(Shelter.ShelterStatus.ACTIVE)
+                            .build(),
+                    Shelter.builder()
+                            .name("New Delhi Red Cross Emergency Shelter")
+                            .organisationId(ngo.getId())
+                            .capacity(750)
+                            .availableBeds(520)
+                            .foodAvailable(true)
+                            .medicalAvailable(true)
+                            .latitude(28.6139)
+                            .longitude(77.2090)
+                            .contactDetails("+91-11-2371-6441")
+                            .status(Shelter.ShelterStatus.ACTIVE)
+                            .build(),
+                    Shelter.builder()
+                            .name("Bhubaneswar State Disaster Relief Center")
+                            .organisationId(ngo.getId())
+                            .capacity(850)
+                            .availableBeds(700)
+                            .foodAvailable(true)
+                            .medicalAvailable(true)
+                            .latitude(20.2961)
+                            .longitude(85.8245)
+                            .contactDetails("+91-674-239-5398")
+                            .status(Shelter.ShelterStatus.ACTIVE)
+                            .build(),
+                    Shelter.builder()
+                            .name("Chennai Coastal Flood Relief Haven")
+                            .organisationId(ngo.getId())
+                            .capacity(700)
+                            .availableBeds(540)
+                            .foodAvailable(true)
+                            .medicalAvailable(true)
+                            .latitude(13.0827)
+                            .longitude(80.2707)
+                            .contactDetails("+91-44-2561-9206")
+                            .status(Shelter.ShelterStatus.ACTIVE)
+                            .build(),
+                    Shelter.builder()
+                            .name("Kolkata Netaji Emergency Shelter")
+                            .organisationId(ngo.getId())
+                            .capacity(950)
+                            .availableBeds(820)
+                            .foodAvailable(true)
+                            .medicalAvailable(true)
+                            .latitude(22.5697)
+                            .longitude(88.3434)
+                            .contactDetails("+91-33-2214-3526")
+                            .status(Shelter.ShelterStatus.ACTIVE)
+                            .build()
+            );
+            for (Shelter s : seedShelters) {
+                s.syncGeo();
+                shelterRepository.save(s);
+            }
         }
 
         // 5. Seed Volunteer

@@ -1,6 +1,6 @@
-import { AlertOctagon, ShieldAlert, CheckCircle } from "lucide-react";
+import { AlertOctagon, ShieldAlert, CheckCircle, Eye } from "lucide-react";
 
-export default function DisasterAlertBanner({ activeDisaster, onResolve }) {
+export default function DisasterAlertBanner({ activeDisaster, onResolve, onInspectDamage }) {
   if (!activeDisaster) return null;
 
   const isAdmin = localStorage.getItem("role") === "ADMIN";
@@ -24,7 +24,7 @@ export default function DisasterAlertBanner({ activeDisaster, onResolve }) {
         }
       `}</style>
       <div 
-        className={`flex items-center justify-between p-4 rounded-2xl border bg-gradient-to-r ${getSeverityColor(activeDisaster.severity)} backdrop-blur-md shadow-2xl`}
+        className={`flex items-center justify-between p-4 rounded-2xl border bg-gradient-to-r ${getSeverityColor(activeDisaster.severity)} backdrop-blur-md shadow-2xl gap-3`}
         style={{ animation: "pulseGlow 2.5s infinite" }}
       >
         <div className="flex items-center gap-3.5 flex-1 min-w-0">
@@ -45,15 +45,27 @@ export default function DisasterAlertBanner({ activeDisaster, onResolve }) {
           </div>
         </div>
 
-        {isAdmin && (
+        <div className="flex items-center gap-2 flex-shrink-0">
           <button
-            onClick={() => onResolve(activeDisaster.id)}
-            className="ml-4 flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-green-500/20 hover:bg-green-500/40 text-green-300 border border-green-500/30 text-xs font-bold transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_0_10px_rgba(34,197,94,0.15)]"
+            type="button"
+            onClick={() => onInspectDamage && onInspectDamage(activeDisaster)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/35 text-cyan-200 border border-cyan-400/40 text-xs font-bold transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(0,240,255,0.25)] cursor-pointer"
           >
-            <CheckCircle className="w-4 h-4" />
-            <span>RESOLVE</span>
+            <Eye className="w-4 h-4 text-cyan-300" />
+            <span className="hidden sm:inline">ANALYZE DAMAGE</span>
+            <span className="sm:hidden">HEATMAP</span>
           </button>
-        )}
+
+          {isAdmin && (
+            <button
+              onClick={() => onResolve(activeDisaster.id)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-green-500/20 hover:bg-green-500/40 text-green-300 border border-green-500/30 text-xs font-bold transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_0_10px_rgba(34,197,94,0.15)]"
+            >
+              <CheckCircle className="w-4 h-4" />
+              <span>RESOLVE</span>
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

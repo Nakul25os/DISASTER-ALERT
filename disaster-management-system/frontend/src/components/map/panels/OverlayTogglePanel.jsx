@@ -1,6 +1,36 @@
-import { Layers, CloudRain, Droplets, AlertTriangle, Shield, MapPin, Truck, Zap, Activity, Flame } from "lucide-react";
+import { useRef, useEffect } from "react";
+import L from "leaflet";
+import { Layers, CloudRain, Droplets, AlertTriangle, Shield, MapPin, Activity, Flame, Map, Radio } from "lucide-react";
 
-export default function OverlayTogglePanel({ activeLayers, toggleLayer }) {
+export default function OverlayTogglePanel({
+  activeLayers,
+  toggleLayer,
+  baseMapPreset = "standard",
+  setBaseMapPreset,
+  osmPresets = {},
+  hasSosButton = false,
+}) {
+  const panelRef = useRef(null);
+
+  useEffect(() => {
+    const el = panelRef.current;
+    if (!el) return;
+
+    // Prevent Leaflet from capturing mouse wheel and click events from this panel
+    L.DomEvent.disableScrollPropagation(el);
+    L.DomEvent.disableClickPropagation(el);
+
+    const onWheel = (e) => {
+      // Ensure the panel scrolls natively and doesn't zoom the map
+      e.stopPropagation();
+    };
+
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => {
+      el.removeEventListener("wheel", onWheel);
+    };
+  }, []);
+
   const categories = [
     {
       title: "Environmental",
@@ -17,23 +47,70 @@ export default function OverlayTogglePanel({ activeLayers, toggleLayer }) {
         { id: "sos", label: "Active SOS Beacons", icon: Activity, color: "text-red-500" },
         { id: "shelters", label: "Relief Shelters", icon: Shield, color: "text-blue-500" },
         { id: "safezones", label: "Safe Zone Perimeters", icon: MapPin, color: "text-green-500" },
-        { id: "evacuation", label: "Evacuation Routes", icon: Truck, color: "text-yellow-400" },
       ],
     },
     {
       title: "AI Analytics",
       layers: [
-        { id: "airisk", label: "AI Threat Heatmap", icon: Zap, color: "text-purple-400" },
+        { id: "socialintel", label: "Social Media Intel", icon: Radio, color: "text-cyan-400" },
       ],
     },
   ];
 
+  const presetList = Object.values(osmPresets);
+
   return (
-    <div className="absolute top-24 left-4 z-[1000] w-72 glow-panel rounded-2xl p-4 flex flex-col gap-4 max-h-[calc(100vh-160px)] overflow-y-auto custom-scrollbar">
-      <div className="flex items-center gap-2 mb-2 border-b border-white/10 pb-3">
-        <Layers className="w-5 h-5 text-accent-blue" />
-        <h3 className="font-bold tracking-widest text-sm uppercase text-white/90">Intelligence Layers</h3>
+    <div
+      ref={panelRef}
+      onWheel={(e) => e.stopPropagation()}
+      className={`absolute ${hasSosButton ? "top-36" : "top-24"} left-4 z-[1000] w-72 glow-panel rounded-2xl p-4 flex flex-col gap-4 overflow-y-auto custom-scrollbar transition-all duration-300`}
+      style={{
+        maxHeight: hasSosButton ? "calc(100vh - 165px)" : "calc(100vh - 120px)",
+        overscrollBehavior: "contain",
+      }}
+    >
+      <div className="flex items-center justify-between border-b border-white/10 pb-3">
+        <div className="flex items-center gap-2">
+          <Layers className="w-5 h-5 text-accent-blue" />
+          <h3 className="font-bold tracking-widest text-sm uppercase text-white/90">Intelligence Layers</h3>
+        </div>
       </div>
+
+      {/* ── OpenStreetMap Base Map Preset Selector ── */}
+      {presetList.length > 0 && setBaseMapPreset && (
+        <div className="space-y-2 border-b border-white/10 pb-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <Map className="w-3.5 h-3.5 text-emerald-400" />
+              <h4 className="text-[10px] text-white/50 uppercase tracking-widest font-bold">Base Map</h4>
+            </div>
+            <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-semibold tracking-wider">
+              OpenStreetMap
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-1.5">
+            {presetList.map((preset) => {
+              const isSelected = baseMapPreset === preset.id;
+              return (
+                <button
+                  key={preset.id}
+                  type="button"
+                  onClick={() => setBaseMapPreset(preset.id)}
+                  className={`p-2 rounded-xl text-left border transition-all ${
+                    isSelected
+                      ? "bg-accent-blue/20 border-accent-blue text-white shadow-[0_0_12px_rgba(0,80,255,0.25)] font-semibold"
+                      : "bg-white/5 border-white/5 text-white/60 hover:bg-white/10 hover:text-white"
+                  }`}
+                >
+                  <div className="text-[11px] leading-tight truncate">{preset.shortName}</div>
+                  <div className="text-[9px] text-white/40 mt-0.5">{preset.badge}</div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {categories.map((cat) => (
         <div key={cat.title} className="space-y-2">
